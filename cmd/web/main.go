@@ -6,10 +6,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/NomanSalhab/golang_b_n_b_training_project/pkg/config"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/pkg/handlers"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/pkg/render"
 	"github.com/alexedwards/scs/v2"
-	"github.com/nomansalhab/golang_b_n_b_training_projec/pkg/config"
-	"github.com/nomansalhab/golang_b_n_b_training_projec/pkg/handlers"
-	"github.com/nomansalhab/golang_b_n_b_training_projec/pkg/render"
 )
 
 const portNumber = ":8016"
