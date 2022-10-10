@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
+	"log"
 	"net/http"
 
-	"github.com/NomanSalhab/golang_b_n_b_training_project/pkg/config"
-	"github.com/NomanSalhab/golang_b_n_b_training_project/pkg/models"
-	"github.com/NomanSalhab/golang_b_n_b_training_project/pkg/render"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/config"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/models"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/render"
 )
 
 // Repo the reposirory user by the handlers
@@ -37,7 +40,7 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	remoteIP := r.RemoteAddr
 	m.App.Session.Put(r.Context(), "remote_ip", remoteIP)
 
-	render.RenderTemplate(w, "home.page.html", &models.TemplateData{})
+	render.RenderTemplate(w, r, "home.page.html", &models.TemplateData{})
 }
 
 // About Page Handler
@@ -54,32 +57,64 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 
 	stringMap["remote_ip"] = remoteIP
 
-	render.RenderTemplate(w, "about.page.html", &models.TemplateData{
+	render.RenderTemplate(w, r, "about.page.html", &models.TemplateData{
 		StringMap: stringMap,
 	})
 }
 
 // Reservation Page Handler
 func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "make-reservation.page.html", &models.TemplateData{})
+	render.RenderTemplate(w, r, "make-reservation.page.html", &models.TemplateData{})
 }
 
 // Generals Page Handler Renders The Room Page
 func (m *Repository) Generals(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "generals.page.html", &models.TemplateData{})
+	render.RenderTemplate(w, r, "generals.page.html", &models.TemplateData{})
 }
 
 // Majors Page Handler Renders The Room Page
 func (m *Repository) Majors(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "majors.page.html", &models.TemplateData{})
+	render.RenderTemplate(w, r, "majors.page.html", &models.TemplateData{})
 }
 
 // Availability Page Handler Renders The Search Availability Page
 func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "search-availability.page.html", &models.TemplateData{})
+	render.RenderTemplate(w, r, "search-availability.page.html", &models.TemplateData{})
+}
+
+// PostAvailability Page Handler Renders The Search Availability Page
+func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
+	// render.RenderTemplate(w, "search-availability.page.html", &models.TemplateData{})
+
+	start := r.Form.Get("start")
+	end := r.Form.Get("end")
+
+	w.Write([]byte(fmt.Sprintf("Start Date Is: %s and End Date Is: %s", start, end)))
+}
+
+// * if this struct is only used in a method or a group of function => put it as close to it/them as possible
+type jsonResponse struct {
+	OK      bool   `json:"ok"`
+	Message string `json:"message"`
+}
+
+// AvailabilityJSON Page Handler Handles The Search Availability Request & Sends A JSON Response
+func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
+	resp := jsonResponse{
+		OK:      true,
+		Message: "Available!",
+	}
+
+	out, err := json.MarshalIndent(resp, "", "     ")
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(string(out))
+	w.Header().Set("Content-Type:", "application/json")
+	w.Write(out)
 }
 
 // Availability Page Handler Renders The Search Availability Page
 func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "contact.page.html", &models.TemplateData{})
+	render.RenderTemplate(w, r, "contact.page.html", &models.TemplateData{})
 }

@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/NomanSalhab/golang_b_n_b_training_project/pkg/config"
-	"github.com/NomanSalhab/golang_b_n_b_training_project/pkg/handlers"
-	"github.com/NomanSalhab/golang_b_n_b_training_project/pkg/render"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/config"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/render"
 	"github.com/alexedwards/scs/v2"
 )
 
