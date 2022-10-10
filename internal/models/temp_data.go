@@ -1,5 +1,7 @@
 package models
 
+import "github.com/NomanSalhab/golang_b_n_b_training_project/internal/forms"
+
 // TemplateData holds data sent from handlers to template
 type TemplateData struct {
 	StringMap map[string]string
@@ -11,4 +13,5 @@ type TemplateData struct {
 	Flash   string //* FlashMessage to send to the user (({status:success}))
 	Warning string
 	Error   string
+	Form    *forms.Form
 }

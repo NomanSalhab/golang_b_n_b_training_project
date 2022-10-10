@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/config"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/forms"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/models"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/render"
 )
@@ -64,7 +65,13 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 
 // Reservation Page Handler
 func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, r, "make-reservation.page.html", &models.TemplateData{})
+	render.RenderTemplate(w, r, "make-reservation.page.html", &models.TemplateData{
+		Form: forms.New(nil),
+	})
+}
+
+// PostReservation Handles The Posting of a Reservation Form
+func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 }
 
 // Generals Page Handler Renders The Room Page

@@ -7,8 +7,8 @@
         <div class="col-lg-6">
             <h1 class="text-center mt-4">Make reservation</h1>
 
-            <form method="post" action="" class="needs-validation" novalidate>
-
+            <form method="post" action="/make-reservation" class="" novalidate> <!-- class="needs-validation" -->
+                <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
                 <div class="form-group mt-5">
                     <label for="first_name">First Name:</label>
                     <input type="text" name="first_name" class="form-control" id="first_name" required
