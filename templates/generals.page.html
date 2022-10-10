@@ -1,0 +1,68 @@
+{{template "base" .}}
+
+{{define "content"}}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <img src="../static/images/generals-quarters.png"
+                class="img-fluid img-thumbnail mx-auto d-block room-image" alt="Room Image">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <h1 class="text-center mt-4">General's Quarters</h1>
+            <p>
+                Your Whatever Hotel I'm a Flutter Developer and this whole website is for learning Golang.
+                Your Whatever Hotel I'm a Flutter Developer and this whole website is for learning Golang.
+                Your Whatever Hotel I'm a Flutter Developer and this whole website is for learning Golang.
+                Your Whatever Hotel I'm a Flutter Developer and this whole website is for learning Golang.
+                Your Whatever Hotel I'm a Flutter Developer and this whole website is for learning Golang.
+                Your Whatever Hotel I'm a Flutter Developer and this whole website is for learning Golang.
+                Your Whatever Hotel I'm a Flutter Developer and this whole website is for learning Golang.
+                Your Whatever Hotel I'm a Flutter Developer and this whole website is for learning Golang.
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col text-center">
+            <!-- <button type="button" class="btn btn-success">Make Reservation Now</button> -->
+            <a id="check-availability-button" href="#!" class="btn btn-success">Check Availability</a>
+        </div>
+    </div>
+
+</div>
+{{end}}
+
+{{define "js"}}
+    <script>
+        
+        let myClickMeButn = document.getElementById("check-availability-button").addEventListener("click", function () {
+            let html = `
+                    <form id="check-availability-form" action="" method="POST" novalidate class="needs-validation">
+                        <div class="row">
+                            <div class="col">
+                                <div class="row" id="reservation-dates-model">
+                                    <div class="col">
+                                        <input disabled required class="form-control" type="text" name="start" id="start" placeholder="Arrival"/>
+                                    </div>
+                                    <div class="col">
+                                        <input disabled required class="form-control" type="text" name="end" id="end" placeholder="Departure"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                `;
+            // let myEl = document.getElementById("myParagraph");
+            // if (!myEl.classList.contains("redText")) {
+            //     myEl.classList.add("redText");
+                attention.custom({
+                    msg: html,
+                    title: "Choose Your Dates",
+                });
+            // } else {
+            //     myEl.classList.remove("redText");
+            // }
+        }); 
+    </script>
+{{end}}
