@@ -2,6 +2,7 @@ package render
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -31,7 +32,7 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 }
 
 // RenderTemplate Function
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 	var tc map[string]*template.Template
 	if app.UseCache {
 		// * Get The Template Cache From The AppConfig
@@ -40,15 +41,11 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 		tc, _ = CreateTemplateCache()
 	}
 
-	// tc, err1 := CreateTemplateCache()
-	// if err1 != nil {
-	// 	fmt.Println("CreateTemplateCache Error:", err1)
-	// 	log.Fatal(err1)
-	// }
 	t, ok := tc[tmpl]
 	if !ok {
 		// log.Fatal("could not get template from template cache")
-		fmt.Println("!ok Error: could not get template from template cache")
+		// fmt.Println("!ok Error: could not get template from template cache")
+		return errors.New("could not get template from template cache")
 	}
 	buf := new(bytes.Buffer)
 
@@ -57,18 +54,15 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	err2 := t.Execute(buf, td)
 	if err2 != nil {
 		fmt.Println("Error at t.Execute", err2)
+		return err2
 	}
 	_, err := buf.WriteTo(w)
 	if err != nil {
 		fmt.Println("Error writing template to browser", err)
+		return err
 	}
-	// parsedTemplate, _ := template.ParseFiles("./templates/" + tmpl)
-	// err := parsedTemplate.Execute(w, nil)
-	// if err != nil {
-	// 	fmt.Println("Error parsing template:", err)
-	// 	return
-	// }
 
+	return nil
 }
 
 // CreateTemplateCache creates a template cache as a map

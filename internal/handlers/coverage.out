@@ -1,0 +1,22 @@
+mode: set
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:24.47,28.2 1 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:31.33,33.2 1 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:36.67,45.2 3 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:48.68,64.2 5 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:67.74,76.2 4 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:79.78,81.16 2 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:86.2,101.19 8 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:111.2,112.66 2 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:81.16,84.3 2 0
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:101.19,110.3 4 0
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:116.71,118.2 1 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:121.69,123.2 1 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:126.75,128.2 1 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:131.79,138.2 3 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:147.79,154.16 3 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:157.2,159.14 3 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:154.16,156.3 1 0
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:163.70,165.2 1 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:168.81,170.9 2 1
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:176.2,182.4 4 0
+github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers/handlers.go:170.9,175.3 4 1
