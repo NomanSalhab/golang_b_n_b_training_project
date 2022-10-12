@@ -1,0 +1,11 @@
+mode: set
+github.com/NomanSalhab/golang_b_n_b_training_project/cmd/web/main.go:22.13,25.16 2 0
+github.com/NomanSalhab/golang_b_n_b_training_project/cmd/web/main.go:29.2,36.17 4 0
+github.com/NomanSalhab/golang_b_n_b_training_project/cmd/web/main.go:25.16,27.3 1 0
+github.com/NomanSalhab/golang_b_n_b_training_project/cmd/web/main.go:36.17,38.3 1 0
+github.com/NomanSalhab/golang_b_n_b_training_project/cmd/web/main.go:41.18,58.16 10 1
+github.com/NomanSalhab/golang_b_n_b_training_project/cmd/web/main.go:62.2,71.12 6 1
+github.com/NomanSalhab/golang_b_n_b_training_project/cmd/web/main.go:58.16,61.3 2 0
+github.com/NomanSalhab/golang_b_n_b_training_project/cmd/web/middleware.go:10.45,21.2 3 1
+github.com/NomanSalhab/golang_b_n_b_training_project/cmd/web/middleware.go:24.50,28.2 1 1
+github.com/NomanSalhab/golang_b_n_b_training_project/cmd/web/routes.go:12.49,40.2 18 1
