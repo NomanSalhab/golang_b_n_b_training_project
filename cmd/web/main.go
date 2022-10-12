@@ -5,10 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/config"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/helpers"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/models"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/render"
 	"github.com/alexedwards/scs/v2"
@@ -18,6 +20,8 @@ const portNumber = ":8016"
 
 var app config.AppConfig
 var session *scs.SessionManager
+var infoLog *log.Logger
+var errorLog *log.Logger
 
 func main() {
 
@@ -46,6 +50,13 @@ func run() error {
 	// * Change This to true in production mode
 	app.InProduction = false
 
+	//? Creating A Logger
+	infoLog = log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog = log.New(os.Stdout, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour              //? 30Min for example for more secure auth
 	session.Cookie.Persist = true                  //? if we want to logout when the session is closed we set Persist to False
@@ -67,6 +78,7 @@ func run() error {
 	handlers.NewHandlers(repo)
 
 	render.NewTemplate(&app)
+	helpers.NewHelpers(&app)
 
 	return nil
 }

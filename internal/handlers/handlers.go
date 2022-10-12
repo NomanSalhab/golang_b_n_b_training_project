@@ -8,6 +8,7 @@ import (
 
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/config"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/forms"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/helpers"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/models"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/render"
 )
@@ -34,33 +35,13 @@ func NewHandlers(r *Repository) {
 
 // Home Page Handler
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
-	// sum := addValues(2, 2)
-	// _, _ = fmt.Fprintf(w, fmt.Sprintf("This is The About Page and 2 + 2 is: %d", sum))
-
-	//* We Will Grab The IP Address of The Visitor and Store it in the Seesion
-	remoteIP := r.RemoteAddr
-	m.App.Session.Put(r.Context(), "remote_ip", remoteIP)
-
 	render.RenderTemplate(w, r, "home.page.html", &models.TemplateData{})
 }
 
 // About Page Handler
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
-	// sum := addValues(2, 2)
-	// _, _ = fmt.Fprintf(w, fmt.Sprintf("This is The About Page and 2 + 2 is: %d", sum))
 
-	// * We Will Perform Some Business Logic
-
-	stringMap := make(map[string]string)
-	stringMap["test"] = "Hello Again"
-
-	remoteIP := m.App.Session.GetString(r.Context(), "remote_ip")
-
-	stringMap["remote_ip"] = remoteIP
-
-	render.RenderTemplate(w, r, "about.page.html", &models.TemplateData{
-		StringMap: stringMap,
-	})
+	render.RenderTemplate(w, r, "about.page.html", &models.TemplateData{})
 }
 
 // Reservation Page Handler
@@ -78,8 +59,10 @@ func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 // PostReservation Handles The Posting of a Reservation Form
 func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
+	// err = errors.New("This Is An Error Message")
 	if err != nil {
-		log.Println(err)
+		// log.Println(err)
+		helpers.ServerError(w, err)
 		return
 	}
 
@@ -152,7 +135,9 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 
 	out, err := json.MarshalIndent(resp, "", "     ")
 	if err != nil {
-		log.Println(err)
+		// log.Println(err)
+		helpers.ServerError(w, err)
+		return
 	}
 	log.Println(string(out))
 	w.Header().Set("Content-Type:", "application/json")
@@ -168,7 +153,8 @@ func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
 	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		log.Println("can't Get Item From Session")
+		// log.Println("can't Get Item From Session")
+		m.App.ErrorLog.Println("can't Get Item From Session")
 		m.App.Session.Put(r.Context(), "error", "Can't Get Reservation From Session")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
