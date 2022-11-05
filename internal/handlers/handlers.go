@@ -7,10 +7,13 @@ import (
 	"net/http"
 
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/config"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/driver"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/forms"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/helpers"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/models"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/render"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/repository"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/repository/dbrepo"
 )
 
 // Repo the reposirory user by the handlers
@@ -19,12 +22,14 @@ var Repo *Repository
 // Repository is the repository type
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 // NewRepo creates a ner Repository
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 

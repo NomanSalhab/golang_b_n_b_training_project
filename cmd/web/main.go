@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/config"
+	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/driver"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/handlers"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/helpers"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/models"
@@ -25,10 +26,11 @@ var errorLog *log.Logger
 
 func main() {
 
-	err := run()
+	db, err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer db.SQL.Close()
 
 	fmt.Printf("Starting Applicationon Port %s", portNumber)
 
@@ -42,7 +44,7 @@ func main() {
 	}
 }
 
-func run() error {
+func run() (*driver.DB, error) {
 
 	//* What to put in the Session
 	gob.Register(models.Reservation{})
@@ -65,20 +67,29 @@ func run() error {
 
 	app.Session = session
 
+	//* Connect To Database
+
+	log.Println("Connecting To Database!")
+	db, err := driver.ConnectSQL("host=localhost port=5432 dbname=bed_n_breakfast user=postgres password=postgresqlgolangpass")
+	if err != nil {
+		log.Fatal("Couldn't Connected To Database!")
+	}
+	log.Println("Connected To Database!")
+
 	tc, err := render.CreateTemplateCache()
 	if err != nil {
 		log.Fatal("cannot create template cache")
-		return err
+		return nil, err
 	}
 	app.TemplateCache = tc
 	// ? When in Development Mode UseCache is false
 	app.UseCache = false
 
-	repo := handlers.NewRepo(&app)
+	repo := handlers.NewRepo(&app, db)
 	handlers.NewHandlers(repo)
 
 	render.NewTemplate(&app)
 	helpers.NewHelpers(&app)
 
-	return nil
+	return db, nil
 }

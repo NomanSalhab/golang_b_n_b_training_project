@@ -55,7 +55,7 @@ func getRoutes() http.Handler {
 	// ? When in Development Mode UseCache is false
 	app.UseCache = true
 
-	repo := NewRepo(&app)
+	repo := NewRepo(&app, nil)
 	NewHandlers(repo)
 
 	render.NewTemplate(&app)
