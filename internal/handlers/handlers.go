@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/config"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/driver"
@@ -14,6 +16,7 @@ import (
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/render"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/repository"
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/repository/dbrepo"
+	"github.com/go-chi/chi"
 )
 
 // Repo the reposirory user by the handlers
@@ -51,18 +54,48 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 
 // Reservation Page Handler
 func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	var emptyReservation models.Reservation
+	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
+	if !ok {
+		helpers.ServerError(w, errors.New("cannot get reservation from session"))
+		return
+	}
+
+	room, err := m.DB.GetRoomByID(res.RoomID)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	res.Room.RoomName = room.RoomName
+
+	m.App.Session.Put(r.Context(), "reservation", res)
+
+	sd := res.StartDate.Format("2006-01-02")
+	ed := res.EndDate.Format("2006-01-02")
+
+	stringMap := make(map[string]string)
+	stringMap["start_date"] = sd
+	stringMap["end_date"] = ed
+
 	data := make(map[string]interface{})
-	data["reservation"] = emptyReservation
+	data["reservation"] = res
 
 	render.Template(w, r, "make-reservation.page.html", &models.TemplateData{
-		Form: forms.New(nil),
-		Data: data,
+		Form:      forms.New(nil),
+		Data:      data,
+		StringMap: stringMap,
 	})
 }
 
 // PostReservation Handles The Posting of a Reservation Form
 func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
+
+	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
+	if !ok {
+		helpers.ServerError(w, errors.New("can's get from session"))
+		return
+	}
+
 	err := r.ParseForm()
 	// err = errors.New("This Is An Error Message")
 	if err != nil {
@@ -71,12 +104,42 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reservation := models.Reservation{
-		FirstName: r.Form.Get("first_name"),
-		LastName:  r.Form.Get("last_name"),
-		Email:     r.Form.Get("email"),
-		Phone:     r.Form.Get("phone"),
-	}
+	// sd := r.Form.Get("start_date")
+	// ed := r.Form.Get("end_date")
+
+	// // 2022-11-15 ----- 11/14 03:04:05PM '22 +0200
+
+	// layout := "2006-Jan-02" //"Mon, 01/02/06, 03:04PM" //
+	// startDate, startErr := time.Parse(layout, sd)
+	// if startErr != nil {
+	// 	helpers.ServerError(w, startErr)
+	// 	return
+	// }
+	// endDate, endErr := time.Parse(layout, ed)
+	// if endErr != nil {
+	// 	helpers.ServerError(w, endErr)
+	// 	return
+	// }
+
+	// roomID, idErr := strconv.Atoi(r.Form.Get("room_id"))
+	// if idErr != nil {
+	// 	helpers.ServerError(w, idErr)
+	// 	return
+	// }
+
+	reservation.FirstName = r.Form.Get("first_name")
+	reservation.LastName = r.Form.Get("last_name")
+	reservation.Phone = r.Form.Get("phone")
+	reservation.Email = r.Form.Get("email")
+	// reservation := models.Reservation{
+	// 	FirstName: r.Form.Get("first_name"),
+	// 	LastName:  r.Form.Get("last_name"),
+	// 	Email:     r.Form.Get("email"),
+	// 	Phone:     r.Form.Get("phone"),
+	// 	StartDate: startDate,
+	// 	EndDate:   endDate,
+	// 	RoomID:    roomID,
+	// }
 
 	form := forms.New(r.PostForm)
 
@@ -96,6 +159,28 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
+
+	newReservationID, err0 := m.DB.InsertReservation(reservation)
+	if err0 != nil {
+		helpers.ServerError(w, err0)
+		return
+	}
+
+	m.App.Session.Put(r.Context(), "reservation", reservation)
+
+	restriction := models.RoomRestriction{
+		StartDate:     reservation.StartDate,
+		EndDate:       reservation.EndDate,
+		RoomID:        reservation.RoomID,
+		ReservationID: newReservationID,
+		RestrictionID: 1,
+	}
+
+	err1 := m.DB.InsertRoomRestriction(restriction)
+	if err1 != nil {
+		helpers.ServerError(w, err1)
+	}
+
 	m.App.Session.Put(r.Context(), "reservation", reservation)
 	http.Redirect(w, r, "/reservation-summary", http.StatusSeeOther)
 }
@@ -122,7 +207,51 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
 
-	w.Write([]byte(fmt.Sprintf("Start Date Is: %s and End Date Is: %s", start, end)))
+	layout := "2006-Jan-02" //"Mon, 01/02/06, 03:04PM" //
+	startDate, startErr := time.Parse(layout, start)
+	if startErr != nil {
+		helpers.ServerError(w, startErr)
+		return
+	}
+	endDate, endErr := time.Parse(layout, end)
+	if endErr != nil {
+		helpers.ServerError(w, endErr)
+		return
+	}
+
+	rooms, err := m.DB.SearchAvailabilityForAllRooms(startDate, endDate)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	// for _, i := range rooms {
+	// 	m.App.InfoLog.Println("ROOM:", i.ID, i.RoomName)
+	// }
+
+	if len(rooms) == 0 {
+		//? No Availability
+		// m.App.InfoLog.Println("No Availability!")
+		m.App.Session.Put(r.Context(), "error", "No Availability")
+		http.Redirect(w, r, "/search-availability", http.StatusSeeOther)
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["rooms"] = rooms
+
+	res := models.Reservation{
+		StartDate: startDate,
+		EndDate:   endDate,
+	}
+
+	m.App.Session.Put(r.Context(), "reservation", res)
+
+	render.Template(w, r, "choose-room.page.html", &models.TemplateData{
+		Data: data,
+	})
+
+	// w.Write([]byte(fmt.Sprintf("Start Date Is: %s and End Date Is: %s", start, end)))
 }
 
 // * if this struct is only used in a method or a group of function => put it as close to it/them as possible
@@ -149,6 +278,27 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 	w.Write(out)
 }
 
+// ChooseRoom
+func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
+	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	// m.App.Session.Get(r.Context(), "reservation")
+	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
+	if !ok {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	res.RoomID = roomID
+
+	m.App.Session.Put(r.Context(), "reservation", res)
+
+	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
+}
+
 // Availability Page Handler Renders The Search Availability Page
 func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "contact.page.html", &models.TemplateData{})
@@ -168,7 +318,15 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 
 	data := make(map[string]interface{})
 	data["reservation"] = reservation
+
+	sd := reservation.StartDate.Format("2006-01-02")
+	ed := reservation.EndDate.Format("2006-01-02")
+	stringMap := make(map[string]string)
+	stringMap["start_date"] = sd
+	stringMap["end_date"] = ed
+
 	render.Template(w, r, "reservation-summary.page.html", &models.TemplateData{
-		Data: data,
+		Data:      data,
+		StringMap: stringMap,
 	})
 }

@@ -89,7 +89,7 @@ func getRoutes() http.Handler {
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
 	return mux
 
-	return nil
+	// return nil
 }
 
 // NoSurf adds CSRF protection to all POST requests
