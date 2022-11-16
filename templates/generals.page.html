@@ -55,13 +55,14 @@
                 `;
                 attention.custom({
                     msg: html,
-                    title: "Choose Your Dates",
+                    title: "Choose Your G Dates",
 
                     willOpen: () => {
                         const elm = document.getElementById("reservation-dates-model");
                         const rp = new DateRangePicker(elm, {
-                            format: "yyyy-mm-dd",
+                            format: 'yyyy-M-dd',
                             showOnFocus: true,
+                            minDate: new Date(),
                         })
                     },
 
@@ -75,7 +76,8 @@
 
                         let form = document.getElementById("check-availability-form");
                         let formData = new FormData(form);
-                        formData.append("csrf_token", "{{.CSRFToken}}")
+                        formData.append("csrf_token", "{{.CSRFToken}}");
+                        formData.append("room_id", "1");
 
                         fetch("/search-availability-json", {// Converting My Fetch From GET to a POST Request
                             method: "post",
@@ -83,9 +85,28 @@
                         })
                             .then(response => response.json())
                             .then(data => {
-                                console.log(data);
-                                console.log(data.ok);
-                                console.log(data.message);
+                                // console.log(data);
+                                // console.log(data.ok);
+                                // console.log(data.message);
+                                if (data.ok) {
+                                    attention.custom({
+                                        icon: 'success',
+                                        msg: '<p>Room Is Available!</p>' 
+                                        + '<p><a href="/book-room?id='
+                                        + data.room_id
+                                        + '&s='
+                                        + data.start_date
+                                        + '&e='
+                                        + data.end_date
+                                        + '" class="btn btn-primary">'
+                                        + 'Book Now</a></p>',
+                                        showConfirmButton: false,
+                                    });
+                                } else {
+                                    attention.error({
+                                        msg: "No availability",
+                                    });
+                                }
                             })
                     }
                 });
