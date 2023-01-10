@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"testing"
 	"time"
 
 	"github.com/NomanSalhab/golang_b_n_b_training_project/internal/config"
@@ -25,7 +26,7 @@ var app config.AppConfig
 var session *scs.SessionManager
 var pathToTemplates = "./../../templates"
 
-func getRoutes() http.Handler {
+func TestMain(m *testing.M) {
 	//* What to put in the Session
 	gob.Register(models.Reservation{})
 
@@ -55,10 +56,16 @@ func getRoutes() http.Handler {
 	// ? When in Development Mode UseCache is false
 	app.UseCache = true
 
-	repo := NewRepo(&app, nil)
+	repo := NewTestRepo(&app)
 	NewHandlers(repo)
 
 	render.NewRenderer(&app)
+
+	os.Exit(m.Run())
+}
+
+func getRoutes() http.Handler {
+	
 
 	mux := chi.NewRouter()
 
